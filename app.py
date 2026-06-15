@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import numpy as np
 import pickle
@@ -259,4 +259,4 @@ else:
     st.warning(
         "Model and data not loaded."
     )
-```
+
