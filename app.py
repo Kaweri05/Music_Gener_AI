@@ -1,4 +1,4 @@
-
+```python
 import streamlit as st
 import numpy as np
 import pickle
@@ -6,11 +6,13 @@ from tensorflow.keras.models import load_model
 from music21 import instrument, note, stream, chord
 import random
 
+# Page configuration
 st.set_page_config(
     page_title="AI Music Generator",
     page_icon="🎵"
 )
 
+# App title
 st.title("AI Music Generator")
 st.write("Generate music using a trained LSTM model.")
 
@@ -18,8 +20,12 @@ st.write("Generate music using a trained LSTM model.")
 @st.cache_resource
 def load_artifacts():
     """Loads the trained model and notes data."""
+
     try:
-       model = load_model("fixed_music_model.keras", compile=False)
+        model = load_model(
+            "fixed_music_model.keras",
+            compile=False
+        )
 
         with open("notes.pkl", "rb") as f:
             notes = pickle.load(f)
@@ -30,7 +36,9 @@ def load_artifacts():
 
     except FileNotFoundError:
         st.error(
-            "Model files (music_model.keras or notes.pkl) not found."
+            "Model files not found. "
+            "Make sure fixed_music_model.keras "
+            "and notes.pkl are uploaded."
         )
         return None, None, None
 
@@ -39,36 +47,56 @@ def load_artifacts():
         return None, None, None
 
 
+# Load model and data
 model, notes, pitchnames = load_artifacts()
 
-if model is not None and notes is not None and pitchnames is not None:
+if (
+    model is not None
+    and notes is not None
+    and pitchnames is not None
+):
 
     sequence_length = 50
 
     note_to_int = {
         note_val: number
-        for number, note_val in enumerate(pitchnames)
+        for number, note_val in enumerate(
+            pitchnames
+        )
     }
 
     int_to_note = {
         number: note_val
-        for number, note_val in enumerate(pitchnames)
+        for number, note_val in enumerate(
+            pitchnames
+        )
     }
 
-    def generate_music(model, notes, pitchnames, sequence_length):
+    def generate_music(
+        model,
+        notes,
+        pitchnames,
+        sequence_length
+    ):
 
         if len(notes) <= sequence_length:
             st.warning(
-                "Not enough notes available to generate music."
+                "Not enough notes "
+                "available to generate music."
             )
             return None
 
         start = random.randint(
             0,
-            len(notes) - sequence_length - 1
+            len(notes)
+            - sequence_length
+            - 1
         )
 
-        pattern_raw = notes[start:start + sequence_length]
+        pattern_raw = notes[
+            start:start + sequence_length
+        ]
+
         pattern_int = [
             note_to_int[n]
             for n in pattern_raw
@@ -93,10 +121,17 @@ if model is not None and notes is not None and pitchnames is not None:
                 verbose=0
             )
 
-            index = np.argmax(prediction)
-            result = int_to_note[index]
+            index = np.argmax(
+                prediction
+            )
 
-            prediction_output.append(result)
+            result = int_to_note[
+                index
+            ]
+
+            prediction_output.append(
+                result
+            )
 
             pattern_int.append(index)
             pattern_int = pattern_int[1:]
@@ -107,6 +142,7 @@ if model is not None and notes is not None and pitchnames is not None:
         for pattern_val in prediction_output:
 
             try:
+                # Chord handling
                 if "." in str(pattern_val):
 
                     notes_in_chord = [
@@ -117,34 +153,52 @@ if model is not None and notes is not None and pitchnames is not None:
                     chord_notes = []
 
                     for current_note in notes_in_chord:
+
                         new_note = note.Note(
                             pitchnames[current_note]
                         )
+
                         new_note.storedInstrument = (
                             instrument.Piano()
                         )
-                        chord_notes.append(new_note)
+
+                        chord_notes.append(
+                            new_note
+                        )
 
                     new_chord = chord.Chord(
                         chord_notes
                     )
-                    new_chord.offset = offset
-                    output_notes.append(new_chord)
+
+                    new_chord.offset = (
+                        offset
+                    )
+
+                    output_notes.append(
+                        new_chord
+                    )
 
                 else:
                     new_note = note.Note(
                         str(pattern_val)
                     )
-                    new_note.offset = offset
+
+                    new_note.offset = (
+                        offset
+                    )
+
                     new_note.storedInstrument = (
                         instrument.Piano()
                     )
-                    output_notes.append(new_note)
+
+                    output_notes.append(
+                        new_note
+                    )
 
             except Exception as e:
                 st.warning(
-                    f"Could not parse note: "
-                    f"{pattern_val} | {e}"
+                    f"Could not parse "
+                    f"{pattern_val}: {e}"
                 )
 
             offset += 0.5
@@ -160,20 +214,26 @@ if model is not None and notes is not None and pitchnames is not None:
 
         return "generated_music.mid"
 
-    if st.button("Generate Music"):
+    # Button
+    if st.button(
+        "Generate Music"
+    ):
 
         with st.spinner(
             "Generating music..."
         ):
 
-            midi_file_path = generate_music(
-                model,
-                notes,
-                pitchnames,
-                sequence_length
+            midi_file_path = (
+                generate_music(
+                    model,
+                    notes,
+                    pitchnames,
+                    sequence_length
+                )
             )
 
             if midi_file_path:
+
                 st.success(
                     "Music Generated!"
                 )
@@ -199,3 +259,4 @@ else:
     st.warning(
         "Model and data not loaded."
     )
+```
