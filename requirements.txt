@@ -1,7 +1,7 @@
 streamlit==1.35.0
-tensorflow==2.13.0
-keras==2.13.1
-numpy==1.24.3
-music21==9.1.0
-pretty_midi==0.2.10
-h5py==3.9.0
+tensorflow==2.20.0
+keras==3.13.2
+numpy
+music21
+pretty_midi
+h5py
