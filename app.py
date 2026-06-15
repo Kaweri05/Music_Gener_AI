@@ -1,4 +1,4 @@
-
+```python
 import streamlit as st
 import numpy as np
 import pickle
@@ -22,11 +22,13 @@ def load_artifacts():
     """Loads the trained model and notes data."""
 
     try:
-      model = load_model(
-    "music_model.h5",
-    compile=False
-)
+        # Load trained model
+        model = load_model(
+            "music_model.h5",
+            compile=False
+        )
 
+        # Load notes file
         with open("notes.pkl", "rb") as f:
             notes = pickle.load(f)
 
@@ -36,7 +38,10 @@ def load_artifacts():
 
     except FileNotFoundError:
         st.error(
-            "Model files not found."
+            "Model files not found. "
+            "Please make sure "
+            "'music_model.h5' and "
+            "'notes.pkl' exist."
         )
         return None, None, None
 
@@ -44,11 +49,6 @@ def load_artifacts():
         st.error(
             f"Error loading model: {e}"
         )
-        return None, None, None
-
-
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
         return None, None, None
 
 
@@ -86,16 +86,14 @@ if (
 
         if len(notes) <= sequence_length:
             st.warning(
-                "Not enough notes "
-                "available to generate music."
+                "Not enough notes available "
+                "to generate music."
             )
             return None
 
         start = random.randint(
             0,
-            len(notes)
-            - sequence_length
-            - 1
+            len(notes) - sequence_length - 1
         )
 
         pattern_raw = notes[
@@ -126,13 +124,9 @@ if (
                 verbose=0
             )
 
-            index = np.argmax(
-                prediction
-            )
+            index = np.argmax(prediction)
 
-            result = int_to_note[
-                index
-            ]
+            result = int_to_note[index]
 
             prediction_output.append(
                 result
@@ -175,9 +169,7 @@ if (
                         chord_notes
                     )
 
-                    new_chord.offset = (
-                        offset
-                    )
+                    new_chord.offset = offset
 
                     output_notes.append(
                         new_chord
@@ -188,9 +180,7 @@ if (
                         str(pattern_val)
                     )
 
-                    new_note.offset = (
-                        offset
-                    )
+                    new_note.offset = offset
 
                     new_note.storedInstrument = (
                         instrument.Piano()
@@ -219,7 +209,7 @@ if (
 
         return "generated_music.mid"
 
-    # Button
+    # Generate button
     if st.button(
         "Generate Music"
     ):
@@ -264,4 +254,4 @@ else:
     st.warning(
         "Model and data not loaded."
     )
-
+```
