@@ -254,3 +254,20 @@ else:
         "Model and data not loaded."
     )
 
+import traceback
+
+@st.cache_resource
+def load_artifacts():
+    try:
+        model = load_model("music_model.h5", compile=False)
+
+        with open("notes.pkl", "rb") as f:
+            notes = pickle.load(f)
+
+        pitchnames = sorted(set(notes))
+        return model, notes, pitchnames
+
+    except Exception as e:
+        st.error(str(e))
+        st.code(traceback.format_exc())
+        return None, None, None
