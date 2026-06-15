@@ -22,10 +22,10 @@ def load_artifacts():
     """Loads the trained model and notes data."""
 
     try:
-        model = load_model(
-            "fixed_music_model.keras",
-            compile=False
-        )
+      model = load_model(
+    "music_model.h5",
+    compile=False
+)
 
         with open("notes.pkl", "rb") as f:
             notes = pickle.load(f)
