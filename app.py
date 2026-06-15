@@ -20,12 +20,17 @@ st.write("Generate music using a trained LSTM model.")
 @st.cache_resource
 def load_artifacts():
     """Loads the trained model and notes data."""
-
-    try:
-        model = load_model(
-            "fixed_music_model.keras",
-            compile=False
-        )
+try:
+    model = load_model(
+        "fixed_music_model.keras",
+        compile=False,
+        safe_mode=False
+    )
+except:
+    model = load_model(
+        "fixed_music_model.keras",
+        compile=False
+    )
 
         with open("notes.pkl", "rb") as f:
             notes = pickle.load(f)
